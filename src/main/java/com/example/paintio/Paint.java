@@ -1,4 +1,5 @@
 package com.example.paintio;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -10,6 +11,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Paint extends Application {
 
@@ -24,6 +29,8 @@ public class Paint extends Application {
 
     private int dx = 0; // View's X direction of movement
     private int dy = 0; // View's Y direction of movement
+
+    private List<Pixel> passedPixels = new ArrayList<>(); // Pixels that passed over the player
 
     @Override
     public void start(Stage primaryStage) {
@@ -62,6 +69,11 @@ public class Paint extends Application {
                     gc.setFill(Color.LIGHTGREY);
                 }
                 gc.fillRect(i * TILE_SIZE - viewX, j * TILE_SIZE - viewY, TILE_SIZE, TILE_SIZE);
+
+                if (passedPixels.contains(new Pixel(i, j))) {
+                    gc.setFill(Color.rgb(255,0,0,.5));
+                    gc.fillRect(i * TILE_SIZE - viewX, j * TILE_SIZE - viewY, TILE_SIZE, TILE_SIZE);
+                }
             }
         }
     }
@@ -74,30 +86,34 @@ public class Paint extends Application {
     private void handleKeyPress(KeyCode keyCode) {
         switch (keyCode) {
             case UP:
-                dx=0;
+                dx = 0;
                 dy = -TILE_SIZE;
                 break;
             case DOWN:
-                dx=0;
+                dx = 0;
                 dy = TILE_SIZE;
                 break;
             case LEFT:
                 dx = -TILE_SIZE;
-                dy=0;
+                dy = 0;
                 break;
             case RIGHT:
                 dx = TILE_SIZE;
-                dy=0;
+                dy = 0;
                 break;
         }
     }
-
 
     private void startAutomaticMovement(GraphicsContext gc) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
             // Update the view's position based on the direction of movement
             viewX += dx;
             viewY += dy;
+
+            // Check if any pixels pass over the player and add them to the list
+            int playerTileX = (int) Math.floor(playerX + viewX / TILE_SIZE);
+            int playerTileY = (int) Math.floor(playerY + viewY / TILE_SIZE);
+            passedPixels.add(new Pixel(playerTileX, playerTileY));
 
             // Redraw the scene
             drawTerrain(gc);
@@ -107,7 +123,35 @@ public class Paint extends Application {
         timeline.play();
     }
 
+    private static class Pixel {
+        private int x;
+        private int y;
+
+        public Pixel(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Pixel pixel = (Pixel) obj;
+            return x == pixel.x && y == pixel.y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 }
+
