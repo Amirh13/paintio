@@ -19,8 +19,8 @@ public class Paint extends Application {
     private int playerX = 15; // Player's X position (tile index)
     private int playerY = 15; // Player's Y position (tile index)
 
-    private int viewX = 0; // View's X position (in pixels)
-    private int viewY = 0; // View's Y position (in pixels)
+    private double viewX = 0; // View's X position (in pixels)
+    private double viewY = 0; // View's Y position (in pixels)
 
     private int dx = 0; // View's X direction of movement
     private int dy = 0; // View's Y direction of movement
@@ -49,8 +49,13 @@ public class Paint extends Application {
     }
 
     private void drawTerrain(GraphicsContext gc) {
-        for (int i = 0; i < NUM_TILES; i++) {
-            for (int j = 0; j < NUM_TILES; j++) {
+        int startTileX = (int) Math.floor(viewX / TILE_SIZE);
+        int startTileY = (int) Math.floor(viewY / TILE_SIZE);
+        int endTileX = (int) Math.ceil((viewX + NUM_TILES * TILE_SIZE) / TILE_SIZE);
+        int endTileY = (int) Math.ceil((viewY + NUM_TILES * TILE_SIZE) / TILE_SIZE);
+
+        for (int i = startTileX; i < endTileX; i++) {
+            for (int j = startTileY; j < endTileY; j++) {
                 if ((i + j) % 2 == 0) {
                     gc.setFill(Color.WHITE);
                 } else {
@@ -69,23 +74,24 @@ public class Paint extends Application {
     private void handleKeyPress(KeyCode keyCode) {
         switch (keyCode) {
             case UP:
-                dx = 0;
-                dy = TILE_SIZE;
-                break;
-            case DOWN:
-                dx = 0;
+                dx=0;
                 dy = -TILE_SIZE;
                 break;
+            case DOWN:
+                dx=0;
+                dy = TILE_SIZE;
+                break;
             case LEFT:
-                dx = TILE_SIZE;
-                dy = 0;
+                dx = -TILE_SIZE;
+                dy=0;
                 break;
             case RIGHT:
-                dx = -TILE_SIZE;
-                dy = 0;
+                dx = TILE_SIZE;
+                dy=0;
                 break;
         }
     }
+
 
     private void startAutomaticMovement(GraphicsContext gc) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
