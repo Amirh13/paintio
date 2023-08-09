@@ -69,16 +69,20 @@ public class Paint extends Application {
     private void handleKeyPress(KeyCode keyCode) {
         switch (keyCode) {
             case UP:
+                dx = 0;
                 dy = TILE_SIZE;
                 break;
             case DOWN:
+                dx = 0;
                 dy = -TILE_SIZE;
                 break;
             case LEFT:
                 dx = TILE_SIZE;
+                dy = 0;
                 break;
             case RIGHT:
                 dx = -TILE_SIZE;
+                dy = 0;
                 break;
         }
     }
@@ -92,10 +96,6 @@ public class Paint extends Application {
             // Redraw the scene
             drawTerrain(gc);
             drawPlayer(gc);
-
-            // Reset the movement direction after updating the view
-            dx = 0;
-            dy = 0;
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
